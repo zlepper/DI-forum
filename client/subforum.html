@@ -11,10 +11,16 @@
     <br>
     <button>submit</button>
     <ul id="subforums"> </ul>
+
+    <label for="subforum-select">List of Subforums: </label>
+    <select id="subforum-select">
+        <option value="">No parent forum</option>
+    </select>
 </form>
 <form id="updateForm">
     <button id="updateButton">update</button>
 </form>
+
 
 <script>
 
@@ -22,12 +28,17 @@
     form.addEventListener("submit",(event)=> {
         event.preventDefault();
         const title = document.getElementById('titleinput').value;
-        createSubforum(title);
+        const id = document.getElementById('subforum-select').value;
+        createSubforum(title, id);
     });
 
-    function createSubforum(title) {
+    function createSubforum(title, parentForumId) {
+        console.log(title, parentForumId);
 
-        let data = {title:title}
+        let data = {
+            title:title,
+            parentid:parentForumId
+        }
         let req = new XMLHttpRequest();
 
         req.addEventListener("load", () => {
@@ -42,18 +53,44 @@
     const updateForm = document.getElementById("updateForm");
     updateForm.addEventListener("submit",(event)=> {
         event.preventDefault();
-        listSubforum();
+        printSubForums();
 
     });
 
-    function listSubforum() {
+    function printSubForums() {
+        getSubforum(forums => {
+            console.log(forums);
+            // TODO Print list of subforums for selection
+        })
+    }
+
+    function getSubforum(cb) {
         let req = new XMLHttpRequest();
         req.addEventListener("load", () => {
             console.log(req.responseText);
-        })
+            const forums = JSON.parse(req.responseText);
+            cb(forums);
+        });
         req.open("GET", "http://localhost:3000/subforums");
         req.send();
     }
+
+    function getSubforumList() {
+        getSubforum((forums) => {
+            console.log(forums);
+            for(let i =0; i < forums.length; i++) {
+                const f = forums[i];
+                const option = document.createElement("option");
+                option.value = f.id;
+                option.innerText = f.title;
+                document.getElementById("subforum-select").appendChild(option);
+            }
+
+        })
+
+    }
+
+    getSubforumList();
 
 </script>
 </body>
