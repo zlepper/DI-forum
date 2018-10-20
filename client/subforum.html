@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DI Forum</title>
+</head>
+<body>
+<form id="subforum">
+    Title:<br>
+    <input type ="text" title="title" id="titleinput">
+    <br>
+    <button>submit</button>
+    <ul id="subforums"> </ul>
+</form>
+<form id="updateForm">
+    <button id="updateButton">update</button>
+</form>
+
+<script>
+
+    const form = document.getElementById("subforum");
+    form.addEventListener("submit",(event)=> {
+        event.preventDefault();
+        const title = document.getElementById('titleinput').value;
+        createSubforum(title);
+    });
+
+    function createSubforum(title) {
+
+        let data = {title:title}
+        let req = new XMLHttpRequest();
+
+        req.addEventListener("load", () => {
+            console.log(req.responseText);
+        })
+        req.open("POST", "http://localhost:3000/subforums");
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(data));
+
+    }
+
+    const updateForm = document.getElementById("updateForm");
+    updateForm.addEventListener("submit",(event)=> {
+        event.preventDefault();
+        listSubforum();
+
+    });
+
+    function listSubforum() {
+        let req = new XMLHttpRequest();
+        req.addEventListener("load", () => {
+            console.log(req.responseText);
+        })
+        req.open("GET", "http://localhost:3000/subforums");
+        req.send();
+    }
+
+</script>
+</body>
+</html>
+
