@@ -15,7 +15,13 @@ exports.subforumHandler= function(app) {
     });
 
     app.get('/subforums', async (req, res) => {
+        const id = req.query.parentid;
         const subforums = await jsonRoutine.loadJSON("subforums.json");
-        res.json(subforums);
+        if(id) {
+            const childForums = subforums.filter(forum => forum.parentid === id);
+            res.json(childForums);
+        } else {
+            res.json(subforums);
+        }
     });
 }
