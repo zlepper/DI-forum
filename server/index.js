@@ -1,5 +1,6 @@
 var posts = require("./posts")
 const subforum = require('./subforum');
+var thread = require("./thread")
 
 const express = require('express')
 var cors = require('cors')
@@ -14,5 +15,7 @@ const port = 3000
 
 posts.addPostsHandler(app)
 subforum.subforumHandler(app);
+thread.addThreadHandler(app);
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
