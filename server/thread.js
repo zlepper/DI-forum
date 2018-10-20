@@ -9,7 +9,7 @@ exports.addThreadHandler = function(app) {
 
     app.post('/thread', (req, res, next) => {
 
-        req.body.id = uuidv4();
+        req.body.id = uuid();
         var threadName = req.body.threadName;
         console.log(threadName);
         threads.push(req.body);
