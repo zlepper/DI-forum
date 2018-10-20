@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DI Forum</title>
+</head>
+<body>
+
+<script>
+    function addPost(event) {
+        event.preventDefault()
+        var {nameinput, textinput} = document.getElementById("newpost")
+        console.log(nameinput.value, textinput.value)
+        var data = {
+            name:nameinput.value + ":",
+            text:textinput.value
+        }
+        nameinput.value = ""
+        textinput.value = ""
+
+        // http://localhost:3000/test
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:3000/test", true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+        xhr.send(JSON.stringify(data));
+
+        xhr.onloadend = () => {
+            console.log(xhr.responseText)
+            loadPosts()
+        };
+    }
+
+    function loadPosts(){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:3000/posts", true);
+
+        xhr.send();
+
+        xhr.onloadend = () => {
+            console.log(xhr.responseText)
+            var posts = JSON.parse(xhr.responseText)
+            printPosts(posts);
+        };
+    }
+
+    function printPosts(posts){
+        var output ="";
+        for (var i = 0; i < posts.length; i++) {
+            output += "<div><span>" + posts[i].name + "</span> <span>" + posts[i].text + "</span> </div>"
+            console.log(output)
+        }
+        document.getElementById("posts").innerHTML = output
+    }
+
+    loadPosts();
+
+</script>
+
+<form onsubmit="addPost(event)" id="newpost">
+    <input type="text" placeholder="Type username" id="usernameinput" name="nameinput">
+    <input type="text" placeholder="Type posttext" id="posttextinput" name="textinput">
+    <button type="submit">Add</button>
+</form>
+<div id="posts"></div>
+</body>
+</html>
