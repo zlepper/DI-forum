@@ -1,16 +1,18 @@
-const express = require('express');
-const bodyparser = require('body-parser');
-const app = express();
-const port = 3000;
-const cors = require('cors');
+var posts = require("./posts")
 const subforum = require('./subforum');
 
-app.use(bodyparser.urlencoded({ extended: false}));
-app.use(bodyparser.json());
-app.use(cors());
+const express = require('express')
+var cors = require('cors')
+var bodyParser = require('body-parser')
+const app = express()
 
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(cors())
+
+const port = 3000
+
+posts.addPostsHandler(app)
 subforum.subforumHandler(app);
 
-app.listen(port, () => console.log(`App listening to port ${port}!`));
-
-
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
