@@ -20,6 +20,11 @@
     <button name="opdate" type="submit">update</button>
 </form>
 
+<form id = "getSubforum">
+
+    <select id = "selectSubforum"></select>
+</form>
+
 <ul id="list">
 
 </ul>
@@ -32,7 +37,9 @@
         req.addEventListener("load", postHandler);
         req.open("Post", "http://localhost:3000/thread");
         req.setRequestHeader("Content-Type", "application/json");
-        req.send(JSON.stringify({"threadName": document.getElementById("inputTitle").value}));
+        var selectedElm = document.getElementById("selectSubforum");
+        var subforum = selectedElm.options[selectedElm.selectedIndex].value;
+        req.send(JSON.stringify({"threadName": document.getElementById("inputTitle").value, "subforum": subforum}));
 
 
     });
@@ -46,10 +53,27 @@
         req.send();
     });
 
+    const formSubforum = document.getElementById("getSubforum");
+        let req = new XMLHttpRequest();
+        req.open("GET", "http://localhost:3000/subforums");
+        req.addEventListener('load', getSubforms);
+        req.send();
+
+    function getSubforms() {
+        if(this.status == 200) {
+            var subforums = document.getElementById("selectSubforum");
+            var option = document.createElement("option");
+            var subFText = JSON.parse(this.responseText);
+            for (subForum of subFText){
+                console.log(subFText);
+                option.text = subForum.title;
+                subforums.add(option);
+            }
+        }
+    }
 
     function postHandler() {
         if (this.status == 200) {
-
             console.log(this.responseText)
         }
     }
@@ -59,8 +83,11 @@
             let responseObj = JSON.parse(this.responseText);
             let list = document.getElementById("list");
             let item = document.createElement('li');
-            item.appendChild(document.createTextNode(responseObj.threadName));
-            list.appendChild(item)
+            for (obj of responseObj) {
+                item.appendChild(document.createTextNode(obj.threadName));
+                list.appendChild(item)
+            }
+
         }
     }
 
