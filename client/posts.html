@@ -3,6 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>DI Forum</title>
+    <style>
+        .thePost {
+            border-style: solid;
+            border-width: 1px;
+            border-color: hotpink;
+        }
+        .name {
+            width: 100px;
+            color: deepskyblue;
+            display: inline-block;
+        }
+        .text {
+            color: hotpink;
+        }
+        .add {
+            background-color: slategrey;
+            color: deepskyblue;
+        }
+    </style>
 </head>
 <body>
 
@@ -48,10 +67,10 @@
     function printPosts(posts){
         var output ="";
         for (var i = 0; i < posts.length; i++) {
-            output += "<div><span>" + posts[i].name + "</span> <span>" + posts[i].text + "</span> </div>"
+            output += "<div><span class='name' >" + posts[i].name + "</span> <span class='text'>" + posts[i].text + "</span> </div>"
             console.log(output)
         }
-        document.getElementById("posts").innerHTML = output
+        document.getElementById("posts").innerHTML = "<div class='thePost'>" + output + "</div>"
     }
 
     loadPosts();
@@ -61,7 +80,7 @@
 <form onsubmit="addPost(event)" id="newpost">
     <input type="text" placeholder="Type username" id="usernameinput" name="nameinput">
     <input type="text" placeholder="Type posttext" id="posttextinput" name="textinput">
-    <button type="submit">Add</button>
+    <button type="submit" class="add">Add</button>
 </form>
 <div id="posts"></div>
 </body>
