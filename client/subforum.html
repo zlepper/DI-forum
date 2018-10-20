@@ -10,7 +10,6 @@
     <input type ="text" title="title" id="titleinput">
     <br>
     <button>submit</button>
-    <ul id="subforums"> </ul>
 
     <label for="subforum-select">List of Subforums: </label>
     <select id="subforum-select">
@@ -20,6 +19,7 @@
 <form id="updateForm">
     <button id="updateButton">update</button>
 </form>
+<div id="subforums"> </div>
 
 
 <script>
@@ -60,7 +60,14 @@
     function printSubForums() {
         getSubforum(forums => {
             console.log(forums);
-            // TODO Print list of subforums for selection
+
+            let subforum = "";
+            for(let i = 0; i < forums.length; i++) {
+                subforum += "<div> <span class='subforum'>" + forums[i].title + "</span> </div>"
+
+            }
+            console.log(subforum);
+            document.getElementById("subforums").innerHTML = subforum;
         })
     }
 
