@@ -10,7 +10,8 @@ exports.addPostsHandler = function (app) {
         res.json(posts);
     })
 
-    app.get('/posts', (req, res) => {
+    app.get('/posts', async (req, res) => {
+        const posts = await jsonRoutine.loadJSON('posts.json');
         res.json(posts)
 
     })
