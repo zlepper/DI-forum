@@ -1,17 +1,27 @@
 const uuidv4 = require('uuid');
+const jsonRoutine = require('./jsonRoutine');
 
 exports.subforumHandler= function(app) {
-    var subforum = [];
 
-    app.post('/subforums', (req, res) =>{
+    app.post('/subforums', async (req, res) =>{
+        const subforums = await jsonRoutine.loadJSON("subforums.json");
+
         req.body.id = uuidv4();
-        subforum.push(req.body);
+        subforums.push(req.body);
+        await jsonRoutine.overwrite(subforums, "subforums.json");
         console.log(req.body);
         res.json("stored object: " + req.body.title);
 
     });
 
-    app.get('/subforums', (req, res) => {
-        res.json(subforum);
+    app.get('/subforums', async (req, res) => {
+        const id = req.query.parentid;
+        const subforums = await jsonRoutine.loadJSON("subforums.json");
+        if(id) {
+            const childForums = subforums.filter(forum => forum.parentid === id);
+            res.json(childForums);
+        } else {
+            res.json(subforums);
+        }
     });
 }
