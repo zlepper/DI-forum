@@ -7,7 +7,17 @@
 <body>
 
 <script>
-    console.log('hello client');
+    function addPost() {
+        var {nameinput, textinput} = document.getElementById("newpost")
+        console.log(nameinput.value, textinput.value)
+    }
 </script>
+
+<form onsubmit="addPost()" id="newpost">
+    <input type="text" placeholder="Type username" id="usernameinput" name="nameinput">
+    <input type="text" placeholder="Type posttext" id="posttextinput" name="textinput">
+    <button type="submit">Add</button>
+</form>
+</form>
 </body>
 </html>
