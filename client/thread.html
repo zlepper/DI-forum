@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DI Forum</title>
+</head>
+<body>
+
+<form id="thread">
+
+    <h1>Thread</h1>
+
+    <input id="inputTitle" type="text" name="Title"> <br>
+    <button name="Click me" type="sumbit"> click me</button>
+
+</form>
+
+<form id = "updateBtn">
+
+    <button name="opdate" type="submit">update</button>
+</form>
+
+<ul id="list">
+
+</ul>
+
+<script>
+    const form = document.getElementById("thread")
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        let req = new XMLHttpRequest();
+        req.addEventListener("load", postHandler);
+        req.open("Post", "http://localhost:3000/thread");
+        req.setRequestHeader("Content-Type", "application/json");
+        req.send(JSON.stringify({"threadName": document.getElementById("inputTitle").value}));
+
+
+    });
+
+    const formUpdate = document.getElementById("updateBtn")
+    formUpdate.addEventListener("submit", (event) => {
+        event.preventDefault();
+        let req = new XMLHttpRequest();
+        req.addEventListener("load", getHandler);
+        req.open("GET", "http://localhost:3000/thread");
+        req.send();
+    });
+
+
+    function postHandler() {
+        if (this.status == 200) {
+
+            console.log(this.responseText)
+        }
+    }
+
+    function getHandler() {
+        if (this.status == 200) {
+            let responseObj = JSON.parse(this.responseText);
+            let list = document.getElementById("list");
+            let item = document.createElement('li');
+            item.appendChild(document.createTextNode(responseObj.threadName));
+            list.appendChild(item)
+        }
+    }
+
+
+</script>
+
+</body>
