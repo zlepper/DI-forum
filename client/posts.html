@@ -73,7 +73,33 @@
         document.getElementById("posts").innerHTML = "<div class='thePost'>" + output + "</div>"
     }
 
+    function loadThreads(){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:3000/thread", true)
+
+        xhr.send();
+
+        xhr.onloadend = () => {
+            console.log(xhr.responseText)
+            var threads = JSON.parse(xhr.responseText)
+            printThreads(threads);
+        }
+    }
+
+    function printThreads(threads){
+        const select = document.getElementById('subforumSelect');
+        for(var i = 0; i < threads.length; i++){
+
+            const option = document.createElement('option');
+            option.value = threads[i].id;
+            option.innerText = threads[i].threadName;
+
+            select.appendChild(option);
+        }
+    }
+
     loadPosts();
+    loadThreads();
 
 </script>
 
@@ -81,6 +107,9 @@
     <input type="text" placeholder="Type username" id="usernameinput" name="nameinput">
     <input type="text" placeholder="Type posttext" id="posttextinput" name="textinput">
     <button type="submit" class="add">Add</button>
+    <select id="subforumSelect">
+        <option value="">--Please choose an thread---</option>
+    </select>
 </form>
 <div id="posts"></div>
 </body>
