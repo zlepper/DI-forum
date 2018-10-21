@@ -3,125 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <title>DI Forum</title>
+    <style>
+        .header {
+            background-color: #96CDCD;
+            text-align: left;
+            padding: 40px;
+            display: block;
+        }
+
+        .post {
+            background-color: #F0FFFF;
+            display: flex;
+            flex-direction: row;
+            margin: 10px;
+            min-height: 50px;
+        }
+
+        .name {
+            background-color: #D1EEEE;
+            display: inline-block;
+            flex: 0 0 150px;
+            padding: 10px;
+        }
+
+        .username {
+            margin: 5px;
+            width: 200px;
+        }
+
+        .posttextInputfelt {
+            margin: 5px;
+            width: 400px;
+            min-height: 150px;
+        }
+        .addPostButton {
+            margin: 5px;
+
+        }
+        .text {
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
 
-<form id="thread">
-
-    <h1>Thread</h1>
-
-    <input id="inputTitle" type="text" name="Title"> <br>
-    <button name="Click me" type="sumbit"> click me</button>
-
-</form>
-
-<form id="updateBtn">
-
-    <button name="opdate" type="submit">update</button>
-</form>
-
-<form id="getSubforum">
-
-    <select id="selectSubforum"></select>
-</form>
-
-<div id="threadsForSubforums">
-    <button id="threadSubforum" type="submit">find threads</button>
+<div id="thread">
+    <h1 id="threadtitle"></h1>
 </div>
+<div id="posts">
 
-<ul id="list">
+    <!-- Posts appears here -->
 
-</ul>
+</div>
+<form onsubmit="addPost(event)" id="newpost">
+    <div>
+        <input class="username" type="text" placeholder="Type username" id="usernameinput" name="nameinput">
+    </div>
+    <div>
+        <textarea class="posttextInputfelt" type="text" placeholder="Type posttext" id="posttextinput" name="textinput"></textarea>
+    </div>
+    <div>
+        <button class="addPostButton" type="submit">Add</button>
+    </div>
+</form>
 
 <script>
-    const form = document.getElementById("thread")
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        var selectedElm = document.getElementById("selectSubforum");
-        var subforum = selectedElm.options[selectedElm.selectedIndex].value;
-        var data = JSON.stringify({"threadName": document.getElementById("inputTitle").value, "subforum": subforum});
-        xhr(postHandler, data, "POST", "http://localhost:3000/thread")
+    let urlParams = new URLSearchParams(window.location.search);
+    let id = urlParams.get('id');
+    console.log(id);
 
-    });
-
-    const buttons = document.getElementById("threadSubforum")
-    buttons.addEventListener("click", (event) => {
-        event.preventDefault();
-        var selectedElm = document.getElementById("selectSubforum");
-        var subforum = selectedElm.options[selectedElm.selectedIndex].value;
-        var url = `http://localhost:3000/thread?subforum=${subforum}`
-        xhr(handleDisplayThreads, {}, "GET", url);
-    });
-
-
-
-    const formUpdate = document.getElementById("updateBtn")
-    formUpdate.addEventListener("submit", (event) => {
-        event.preventDefault();
+    function getThread(id) {
         let req = new XMLHttpRequest();
-        req.open("GET", "http://localhost:3000/thread");
-        req.addEventListener('load', getHandler);
+        req.open("GET", "http://localhost:3000/thread/" + id);
+        req.addEventListener('load', () => {
+            console.log(req.responseText);
+            printThread(JSON.parse(req.responseText));
+        })
         req.send();
-    });
-
-    const formSubforum = document.getElementById("getSubforum");
-    let req = new XMLHttpRequest();
-    req.open("GET", "http://localhost:3000/subforums");
-    req.addEventListener('load', getSubforms);
-    req.send();
-
-    function handleDisplayThreads(){
-        if (this.status == 200){
-            console.log(this.responseText);
-        }
     }
 
-    function getSubforms() {
-        if (this.status == 200) {
-            var subforums = document.getElementById("selectSubforum");
-            var subFText = JSON.parse(this.responseText);
-            for (subForum of subFText) {
-                var option = document.createElement("option");
-                console.log(subForum);
-                option.text = subForum.title;
-                subforums.add(option);
-            }
-        }
+    function printThread(thread) {
+        document.getElementById("threadtitle").innerHTML = "<div><span class='header'>" + thread.threadName;
+        "</div>"
     }
 
-    function postHandler() {
-        if (this.status == 200) {
-            console.log(this.responseText)
-        }
-    }
-
-    function getHandler() {
-        if (this.status == 200) {
-            let responseObj = JSON.parse(this.responseText);
-            let list = document.getElementById("list");
-            let item = document.createElement('li');
-            for (obj of responseObj) {
-                item.appendChild(document.createTextNode(obj.threadName));
-                list.appendChild(item)
-            }
-
-        }
-    }
-
-    function xhr(callback, data, RESTmethod, url) {
+    function getPosts(id) {
         let req = new XMLHttpRequest();
-        req.addEventListener("load", callback);
-        req.open(RESTmethod, url);
-        req.setRequestHeader("Content-Type", "application/json");
-        if (RESTmethod === "POST") {
-            req.send(data);
-        }
-        else {
-            req.send();
-        }
+        req.open("GET", "http://localhost:3000/posts?threadId=" + id);
+        req.addEventListener('load', () => {
+            console.log(req.responseText);
+            printPosts(JSON.parse(req.responseText));
+        })
+        req.send();
     }
 
+    function printPosts(posts) {
+        var output = "";
+        for (var i = 0; i < posts.length; i++) {
+            output += "<div class='post'><span class='name' >" + posts[i].name + "</span> <span class='text'>" + posts[i].text.replace("\n", "<br>") + "</span> </div>"
+            console.log(output)
+        }
+        document.getElementById("posts").innerHTML = output;
+    }
+
+    function addPost(event) {
+        event.preventDefault();
+        var {nameinput, textinput} = document.getElementById("newpost");
+        console.log(nameinput.value, textinput.value);
+        const name = nameinput.value;
+        const text = textinput.value;
+
+        if(name == "") {
+            return;
+        }
+
+        if(text == "") {
+            return;
+        }
+
+        var data = {
+            name: name,
+            text: text,
+            threadId: id
+        };
+
+        nameinput.value = "";
+        textinput.value = "";
+
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:3000/posts", true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+        xhr.send(JSON.stringify(data));
+
+        xhr.onloadend = () => {
+            console.log(xhr.responseText);
+            getPosts(id);
+        };
+    }
+
+    getPosts(id);
+    getThread(id);
 
 </script>
 
 </body>
+</html>

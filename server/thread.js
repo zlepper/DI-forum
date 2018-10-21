@@ -29,5 +29,19 @@ exports.addThreadHandler = function(app) {
         res.json(req.body);
     });
 
+    app.get('/thread/:id', async (req, res) => {
+
+        const threads = await jsonRoutine.loadJSON('threads.json');
+        var threadId = req.params.id;
+
+        for (let i = 0; i < threads.length; i++){
+            if (threadId == threads[i].id){
+                res.json(threads[i]);
+                return;
+            }
+        }
+        res.sendStatus(404);
+    });
+
 };
 
