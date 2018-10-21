@@ -10,12 +10,12 @@ const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cors())
+app.use(express.static('./client'));
 
 const port = 3000
 
 posts.addPostsHandler(app)
 subforum.subforumHandler(app);
 thread.addThreadHandler(app);
-
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

@@ -17,7 +17,11 @@ function load(path = './server/persistence.json') {
     return readFile(path, 'utf8')
 }
 
-async function loadJSON(path = './server/persistence.json') {
-    let text = await load(path);
-    return JSON.parse(text);
+async function loadJSON(path = './server/persistence.json', defaultValue = []) {
+    try {
+        let text = await load(path);
+        return JSON.parse(text);
+    } catch(e) {
+        return defaultValue;
+    }
 }
