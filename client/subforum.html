@@ -76,6 +76,8 @@
         })
     }
 
+    //USED IN INDEX.HTML
+
     function getSubforum(cb) {
         let req = new XMLHttpRequest();
         req.addEventListener("load", () => {
@@ -86,6 +88,8 @@
         req.open("GET", "http://localhost:3000/subforums");
         req.send();
     }
+
+    //USED IN INDEX.HTML
 
     function getSubforumList() {
         getSubforum((forums) => {
@@ -103,6 +107,8 @@
     }
 
     getSubforumList();
+
+    //USED IN HTML
 
     function populateSubforumSelector() {
         getSubforum((forums) => {
