@@ -8,13 +8,13 @@ exports.load = load;
 exports.loadJSON = loadJSON;
 
 //Overwrites the current persistence.json file with whatever data is if it is valid json
-function overwrite(data, path = './server/persistence.json') {
-    return writeFile(path, JSON.stringify(data));
+function overwrite(data, path = 'persistence.json') {
+    return writeFile('./server/' + path, JSON.stringify(data));
 }
 
 //Loads a jsonfile asynchronusly, can optionally specify a new path
-function load(path = './server/persistence.json') {
-    return readFile(path, 'utf8')
+function load(path = 'persistence.json') {
+    return readFile('./server/' + path, 'utf8')
 }
 
 async function loadJSON(path = './server/persistence.json', defaultValue = []) {
