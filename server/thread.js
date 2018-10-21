@@ -2,13 +2,13 @@ var uuid = require("uuid/v4");
 let jsonRoutine = require("./jsonRoutine");
 
 exports.addThreadHandler = function(app) {
-    var threads = [];
 
-    app.get('/thread', (req, res, next) => {
-        var subforum = req.query.subforum;
+    app.get('/thread', async (req, res, next) => {
+        var subforum = req.query.subforumId;
         console.log("subforum: " + subforum)
+        const threads  = await jsonRoutine.loadJSON("threads.json");
         if(!typeof subforum === undefined ){
-            const result = threads.filter(thread => thread.subforum === subforum);
+            const result = threads.filter(thread => thread.subforumId === subforum);
             console.log("subforum stuff" + result)
 ;            res.json(result);
         } else {
@@ -19,7 +19,6 @@ exports.addThreadHandler = function(app) {
     });
 
     app.post('/thread', async (req, res, next) => {
-
         const threads = await jsonRoutine.loadJSON('threads.json');
         req.body.id = uuid();
         var threadName = req.body.threadName;

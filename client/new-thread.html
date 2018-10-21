@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Thread</title>
+</head>
+<style>
+
+    body {
+        background-color: lightblue;
+    }
+
+    h1{
+        color: white;
+    }
+
+    p {
+
+        margin-bottom: 10px;
+
+    }
+
+    input {
+        margin-bottom: 10px;
+    }
+
+</style>
+
+<body>
+
+<h1>New Thread</h1>
+<p>Add a new thread to forum</p>
+
+<form id="form">
+    <input id="threadName" type="text" placeholder="Enter thread name">
+    <input id="threadOwner" type="text" placeholder="Enter your name">
+    <br>
+    <textarea rows="4" cols="50" placeholder="Enter your text"></textarea>
+</form>
+
+<button id="addThread" onclick="addNewThread()">Add new thread</button>
+
+<script>
+
+    function addNewThread() {
+        let req = new XMLHttpRequest();
+
+        var url = window.location.href;
+        var queryParam = new URLSearchParams(url);
+        var forumId = queryParam.get("forumId");
+
+        req.open("POST", "http://localhost:3000/thread");
+        req.setRequestHeader("Content-Type", "application/json");
+        req.addEventListener("load", postNewThreadHandler);
+        req.addEventListener("error", () => {
+            debugger;
+            console.log(req);
+        })
+        var data = JSON.stringify({
+            "threadName": document.getElementById("threadName").value,
+            "threadOwner": document.getElementById("threadOwner").value,
+            "forumId": forumId
+        });
+        console.log(data);
+        req.send(data);
+
+    }
+
+    function postNewThreadHandler() {
+        if(this.status == 200) {
+            console.log(this.responseText);
+        }
+    }
+
+</script>
+
+</body>
+</html>

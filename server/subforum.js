@@ -24,4 +24,15 @@ exports.subforumHandler= function(app) {
             res.json(subforums);
         }
     });
+
+    app.get('/subforums/:id', async (req, res) =>  {
+        const id = req.params.id;
+        const forums = await jsonRoutine.loadJSON("subforums.json");
+        if(id) {
+            const subforum = forums.find(forum => forum.id === id);
+            res.json(subforum);
+        }
+
+
+    });
 }
