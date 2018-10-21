@@ -77,7 +77,7 @@
             var response = JSON.parse(this.responseText);
             var forumTitle = response.title;
             let header = document.getElementById("forumName");
-            if(forumTitle !== null) {
+            if(forumTitle !== null && forumTitle !== undefined) {
                 header.innerText = forumTitle;
             }
             else {
