@@ -2,171 +2,95 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DI Forum</title>
+    <title>subforum</title>
 </head>
-<body>
-<form id="subforum">
-    Title:<br>
-    <input type ="text" title="title" id="titleinput">
-    <br>
-    <button>submit</button>
 
-    <label for="subforum-select">List of Subforums: </label>
-    <select id="subforum-select">
-        <option value="">No parent forum</option>
-    </select>
-</form>
-<form id="updateForm">
-    <button id="updateButton">update</button>
-</form>
-<div id="subforums"> </div>
-<form id="subforumSelector">
-    <button>List subforums</button>
-    <select id="subforumSelector-select">
-        <option value="">Select forum</option>
-    </select>
-</form>
+<style>
+
+    body{
+        background-color: lightpink;
+    }
+
+    h1{
+        color: white;
+    }
+
+    a.button {
+        -webkit-appearance: button;
+        -moz-appearance: button;
+        appearance: button;
+
+        text-decoration: none;
+        color: initial;
+    }
+
+</style>
+
+<body>
+
+<h1 id = "forumName"></h1>
+
+<p>Links to threads in the forum:</p>
+
+<ul id="listsCorrespThreads">
+
+</ul>
+
+<a href="new-thread.html" class="button">Create new Thread</a>
+
+
 
 <script>
 
-    const form = document.getElementById("subforum");
-    form.addEventListener("submit",(event)=> {
-        event.preventDefault();
-        const title = document.getElementById('titleinput').value;
-        const id = document.getElementById('subforum-select').value;
-        createSubforum(title, id);
-    });
-
-    function createSubforum(title, parentForumId) {
-        console.log(title, parentForumId);
-
-        let data = {
-            title:title,
-            parentid:parentForumId
-        }
+    (function getForumName() {
         let req = new XMLHttpRequest();
-
-        req.addEventListener("load", () => {
-            console.log(req.responseText);
-        })
-        req.open("POST", "http://localhost:3000/subforums");
-        req.setRequestHeader('Content-Type', 'application/json');
-        req.send(JSON.stringify(data));
-
-    }
-
-    const updateForm = document.getElementById("updateForm");
-    updateForm.addEventListener("submit",(event)=> {
-        event.preventDefault();
-        printSubForums();
-
-    });
-
-    function printSubForums() {
-        getSubforum(forums => {
-            console.log(forums);
-
-            let subforum = "";
-            for(let i = 0; i < forums.length; i++) {
-                subforum += "<div> <span class='subforum'>" + forums[i].title + "</span> </div>"
-
-            }
-            console.log(subforum);
-            document.getElementById("subforums").innerHTML = subforum;
-        })
-    }
-
-    //USED IN INDEX.HTML
-
-    function getSubforum(cb) {
-        let req = new XMLHttpRequest();
-        req.addEventListener("load", () => {
-            console.log(req.responseText);
-            const forums = JSON.parse(req.responseText);
-            cb(forums);
-        });
-        req.open("GET", "http://localhost:3000/subforums");
+        var url = window.location.search;
+        var queryParam = new URLSearchParams(url);
+        var subforumId = queryParam.get("id");
+        req.open("GET", `http://localhost:3000/subforums/${subforumId}`);
+        req.addEventListener("load", forumNameHandler);
         req.send();
-    }
+    })();
 
-    //USED IN INDEX.HTML
+    let req = new XMLHttpRequest();
+    var url = window.location.href;
+    var queryParam = new URLSearchParams(url);
+    var subforumId = queryParam.get("id");
+    req.open("GET", `http://localhost:3000/thread?subforum=${subforumId}`);
+    req.addEventListener("load", handleThreadReponse);
+    req.send();
 
-    function getSubforumList() {
-        getSubforum((forums) => {
-            console.log(forums);
-            for(let i =0; i < forums.length; i++) {
-                const f = forums[i];
-                const option = document.createElement("option");
-                option.value = f.id;
-                option.innerText = f.title;
-                document.getElementById("subforum-select").appendChild(option);
-            }
-
-        })
-
-    }
-
-    getSubforumList();
-
-    //USED IN HTML
-
-    function populateSubforumSelector() {
-        getSubforum((forums) => {
-            console.log(forums);
-            for(let i =0; i < forums.length; i++) {
-                const f = forums[i];
-                const option = document.createElement("option");
-                option.value = f.id;
-                option.innerText = f.title;
-                document.getElementById("subforumSelector-select").appendChild(option);
-            }
-
-        })
-
-    }
-
-    populateSubforumSelector();
-
-    function getChildForums(parentId) {
-        let req = new XMLHttpRequest();
-        req.addEventListener("load", () => {
-            console.log(req.responseText);
-           // const forums = JSON.parse(req.responseText);
-            //cb(forums);
-            printChildForums(JSON.parse(req.responseText));
-        });
-        req.open("GET", "http://localhost:3000/subforums?parentid=" + parentId);
-        req.send();
-
-    }
-
-    document.getElementById("subforumSelector").addEventListener("submit", event => {
-        event.preventDefault();
-        const id = document.getElementById("subforumSelector-select").value;
-        if(id) {
-            getChildForums(id);
+    function handleThreadReponse() {
+        var reponseT = JSON.parse(this.responseText);
+        let list = document.getElementById("listsCorrespThreads");
+        for(obj of reponseT) {
+            let item = document.createElement("li");
+            var threadId = obj.id;
+            item.innerHTML =`<a href="thread.html?id=${threadId}">${obj.threadName}</a>`;
+            list.appendChild(item);
         }
 
-    })
-
-    function printChildForums(forums) {
-
-            let subforum = "";
-            for(let i = 0; i < forums.length; i++) {
-                subforum += "<div> <span class='subforum'>" + forums[i].title + "</span> </div>"
-
-            }
-            console.log(subforum);
-            document.getElementById("subforums").innerHTML = subforum;
-
     }
+
+    function forumNameHandler() {
+        if(this.status == 200) {
+            var response = JSON.parse(this.responseText);
+            var forumTitle = response.title;
+            let header = document.getElementById("forumName");
+            if(forumTitle !== null) {
+                header.innerText = forumTitle;
+            }
+            else {
+                header.innerText = "FORUM";
+            }
+
+        }
+    }
+
+
 
 </script>
-<style>
-    form {
-        border: pink 1px solid;
-    }
-</style>
+
+
 </body>
 </html>
-
