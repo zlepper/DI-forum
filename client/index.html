@@ -5,19 +5,95 @@
     <title>DI Forum</title>
 </head>
 <body>
+<!--<a href="/subforum.html?id=${id}">${title}</a>-->
+<h1>Forum</h1>
+<div id="forum-list"></div>
+
+
+
+<style>
+    .forum {
+        display: block;
+        padding-left: 16px;
+
+
+
+    }
+    a:link {
+          color: blue;
+      }
+
+    a:visited {
+        color: red;
+    }
+</style>
 
 <script>
-    function addPost() {
-        var {nameinput, textinput} = document.getElementById("newpost")
-        console.log(nameinput.value, textinput.value)
+
+    let subforum = "";
+
+    function getSubforum(cb) {
+        let req = new XMLHttpRequest();
+        req.addEventListener("load", () => {
+            console.log(req.responseText);
+            const forums = JSON.parse(req.responseText);
+            cb(forums);
+        });
+        req.open("GET", "http://localhost:3000/subforums");
+        req.send();
     }
+
+    function getSubforumList() {
+        getSubforum((forums) => {
+            console.log(forums);
+
+            // Recreate tree of elements
+
+            for (f of forums) {
+                if(!f.children) {
+                    f.children = [];
+                } if(!f.depth) {
+                    f.depth = 0;
+                }
+
+
+                if (f.parentid){
+                    const forum = forums.find(forum => f.parentid === forum.id);
+                    f.depth = forum.depth+1;
+                    forum.children.push(f);
+                }
+
+            }
+
+            console.log(forums);
+            let forumTree = forums.filter(forum => forum.parentid === "");
+            console.log(forumTree);
+            displayForums(forumTree);
+
+        })
+    }
+    getSubforumList();
+
+    function displayForums(forums) {
+        for(f of forums) {
+            let tab = "";
+            for(let i =0; i < f.depth; i++) {
+                tab += "&nbsp&nbsp";
+            }
+
+            subforum += "<div>" + tab + "<a href='subforum.html?id='" + f.id + ">" + f.title + "</a> </div>";
+            document.getElementById("forum-list").innerHTML = subforum;
+            if(f.children.length > 0) {
+                displayForums(f.children);
+            }
+        }
+
+    }
+
+
+
+
 </script>
 
-<form onsubmit="addPost()" id="newpost">
-    <input type="text" placeholder="Type username" id="usernameinput" name="nameinput">
-    <input type="text" placeholder="Type posttext" id="posttextinput" name="textinput">
-    <button type="submit">Add</button>
-</form>
-</form>
 </body>
 </html>
