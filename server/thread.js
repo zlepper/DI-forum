@@ -34,6 +34,7 @@ exports.addThreadHandler = function(app) {
         const threads = await jsonRoutine.loadJSON('threads.json');
         var threadId = req.params.id;
 
+        console.log(threads);
         for (let i = 0; i < threads.length; i++){
             if (threadId == threads[i].id){
                 res.json(threads[i]);

@@ -22,6 +22,7 @@ async function loadJSON(path = './server/persistence.json', defaultValue = []) {
         let text = await load(path);
         return JSON.parse(text);
     } catch(e) {
+        console.log(e);
         return defaultValue;
     }
 }

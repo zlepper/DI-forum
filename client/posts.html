@@ -9,14 +9,17 @@
             border-width: 1px;
             border-color: hotpink;
         }
+
         .name {
             width: 100px;
             color: deepskyblue;
             display: inline-block;
         }
+
         .text {
             color: hotpink;
         }
+
         .add {
             background-color: slategrey;
             color: deepskyblue;
@@ -25,14 +28,16 @@
 </head>
 <body>
 
-<script>
+<script type="module">
+
+
     function addPost(event) {
         event.preventDefault()
         var {nameinput, textinput} = document.getElementById("newpost")
         console.log(nameinput.value, textinput.value)
         var data = {
-            name:nameinput.value + ":",
-            text:textinput.value
+            name: nameinput.value + ":",
+            text: textinput.value
         }
         nameinput.value = ""
         textinput.value = ""
@@ -51,7 +56,7 @@
         };
     }
 
-    function loadPosts(){
+    function loadPosts() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "http://localhost:3000/posts", true);
 
@@ -64,8 +69,8 @@
         };
     }
 
-    function printPosts(posts){
-        var output ="";
+    function printPosts(posts) {
+        var output = "";
         for (var i = 0; i < posts.length; i++) {
             output += "<div><span class='name' >" + posts[i].name + "</span> <span class='text'>" + posts[i].text + "</span> </div>"
             console.log(output)
@@ -73,7 +78,7 @@
         document.getElementById("posts").innerHTML = "<div class='thePost'>" + output + "</div>"
     }
 
-    function loadThreads(){
+    function loadThreads() {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "http://localhost:3000/thread", true)
 
@@ -86,9 +91,9 @@
         }
     }
 
-    function printThreads(threads){
+    function printThreads(threads) {
         const select = document.getElementById('subforumSelect');
-        for(var i = 0; i < threads.length; i++){
+        for (var i = 0; i < threads.length; i++) {
 
             const option = document.createElement('option');
             option.value = threads[i].id;

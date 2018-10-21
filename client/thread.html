@@ -64,7 +64,7 @@
     <!-- Posts appears here -->
 
 </div>
-<form onsubmit="addPost(event)" id="newpost">
+<form id="newpost">
     <div>
         <input class="username" type="text" placeholder="Type username" id="usernameinput" name="nameinput">
     </div>
@@ -76,34 +76,26 @@
     </div>
 </form>
 
-<script>
+<script type="module">
+    import {post, get} from "./shared.js"
+
     let urlParams = new URLSearchParams(window.location.search);
     let id = urlParams.get('id');
     console.log(id);
 
-    function getThread(id) {
-        let req = new XMLHttpRequest();
-        req.open("GET", "http://localhost:3000/thread/" + id);
-        req.addEventListener('load', () => {
-            console.log(req.responseText);
-            printThread(JSON.parse(req.responseText));
-        })
-        req.send();
+    async function getThread(id) {
+        const response = await get("http://localhost:3000/thread/" + id);
+        printThread(JSON.parse(response));
     }
 
     function printThread(thread) {
-        document.getElementById("threadtitle").innerHTML = "<div><span class='header'>" + thread.threadName;
+        document.getElementById("threadtitle").innerHTML = "<div><span class='header'>" + thread.threadName +
         "</div>"
     }
 
-    function getPosts(id) {
-        let req = new XMLHttpRequest();
-        req.open("GET", "http://localhost:3000/posts?threadId=" + id);
-        req.addEventListener('load', () => {
-            console.log(req.responseText);
-            printPosts(JSON.parse(req.responseText));
-        })
-        req.send();
+    async function getPosts(id) {
+        const response = await get("http://localhost:3000/posts?threadId=" + id);
+        printPosts(JSON.parse(response));
     }
 
     function printPosts(posts) {
@@ -115,7 +107,9 @@
         document.getElementById("posts").innerHTML = output;
     }
 
-    function addPost(event) {
+    document.getElementById('newpost').addEventListener('submit', addPost)
+
+    async function addPost(event) {
         event.preventDefault();
         var {nameinput, textinput} = document.getElementById("newpost");
         console.log(nameinput.value, textinput.value);
@@ -136,20 +130,13 @@
             threadId: id
         };
 
+        console.log(data);
+
         nameinput.value = "";
         textinput.value = "";
 
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:3000/posts", true);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-
-        xhr.send(JSON.stringify(data));
-
-        xhr.onloadend = () => {
-            console.log(xhr.responseText);
-            getPosts(id);
-        };
+        await post("http://localhost:3000/posts", data);
+        getPosts(id);
     }
 
     getPosts(id);
