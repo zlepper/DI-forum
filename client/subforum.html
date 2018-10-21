@@ -10,10 +10,21 @@
     <input type ="text" title="title" id="titleinput">
     <br>
     <button>submit</button>
-    <ul id="subforums"> </ul>
+
+    <label for="subforum-select">List of Subforums: </label>
+    <select id="subforum-select">
+        <option value="">No parent forum</option>
+    </select>
 </form>
 <form id="updateForm">
     <button id="updateButton">update</button>
+</form>
+<div id="subforums"> </div>
+<form id="subforumSelector">
+    <button>List subforums</button>
+    <select id="subforumSelector-select">
+        <option value="">Select forum</option>
+    </select>
 </form>
 
 <script>
@@ -22,12 +33,17 @@
     form.addEventListener("submit",(event)=> {
         event.preventDefault();
         const title = document.getElementById('titleinput').value;
-        createSubforum(title);
+        const id = document.getElementById('subforum-select').value;
+        createSubforum(title, id);
     });
 
-    function createSubforum(title) {
+    function createSubforum(title, parentForumId) {
+        console.log(title, parentForumId);
 
-        let data = {title:title}
+        let data = {
+            title:title,
+            parentid:parentForumId
+        }
         let req = new XMLHttpRequest();
 
         req.addEventListener("load", () => {
@@ -42,20 +58,109 @@
     const updateForm = document.getElementById("updateForm");
     updateForm.addEventListener("submit",(event)=> {
         event.preventDefault();
-        listSubforum();
+        printSubForums();
 
     });
 
-    function listSubforum() {
+    function printSubForums() {
+        getSubforum(forums => {
+            console.log(forums);
+
+            let subforum = "";
+            for(let i = 0; i < forums.length; i++) {
+                subforum += "<div> <span class='subforum'>" + forums[i].title + "</span> </div>"
+
+            }
+            console.log(subforum);
+            document.getElementById("subforums").innerHTML = subforum;
+        })
+    }
+
+    function getSubforum(cb) {
         let req = new XMLHttpRequest();
         req.addEventListener("load", () => {
             console.log(req.responseText);
-        })
+            const forums = JSON.parse(req.responseText);
+            cb(forums);
+        });
         req.open("GET", "http://localhost:3000/subforums");
         req.send();
     }
 
+    function getSubforumList() {
+        getSubforum((forums) => {
+            console.log(forums);
+            for(let i =0; i < forums.length; i++) {
+                const f = forums[i];
+                const option = document.createElement("option");
+                option.value = f.id;
+                option.innerText = f.title;
+                document.getElementById("subforum-select").appendChild(option);
+            }
+
+        })
+
+    }
+
+    getSubforumList();
+
+    function populateSubforumSelector() {
+        getSubforum((forums) => {
+            console.log(forums);
+            for(let i =0; i < forums.length; i++) {
+                const f = forums[i];
+                const option = document.createElement("option");
+                option.value = f.id;
+                option.innerText = f.title;
+                document.getElementById("subforumSelector-select").appendChild(option);
+            }
+
+        })
+
+    }
+
+    populateSubforumSelector();
+
+    function getChildForums(parentId) {
+        let req = new XMLHttpRequest();
+        req.addEventListener("load", () => {
+            console.log(req.responseText);
+           // const forums = JSON.parse(req.responseText);
+            //cb(forums);
+            printChildForums(JSON.parse(req.responseText));
+        });
+        req.open("GET", "http://localhost:3000/subforums?parentid=" + parentId);
+        req.send();
+
+    }
+
+    document.getElementById("subforumSelector").addEventListener("submit", event => {
+        event.preventDefault();
+        const id = document.getElementById("subforumSelector-select").value;
+        if(id) {
+            getChildForums(id);
+        }
+
+    })
+
+    function printChildForums(forums) {
+
+            let subforum = "";
+            for(let i = 0; i < forums.length; i++) {
+                subforum += "<div> <span class='subforum'>" + forums[i].title + "</span> </div>"
+
+            }
+            console.log(subforum);
+            document.getElementById("subforums").innerHTML = subforum;
+
+    }
+
 </script>
+<style>
+    form {
+        border: pink 1px solid;
+    }
+</style>
 </body>
 </html>
 
