@@ -2,95 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>subforum</title>
+    <title>DI Forum</title>
 </head>
-
-<style>
-
-    body{
-        background-color: lightpink;
-    }
-
-    h1{
-        color: white;
-    }
-
-    a.button {
-        -webkit-appearance: button;
-        -moz-appearance: button;
-        appearance: button;
-
-        text-decoration: none;
-        color: initial;
-    }
-
-</style>
-
 <body>
 
-<h1 id = "forumName"></h1>
 
-<p>Links to threads in the forum:</p>
-
-<ul id="listsCorrespThreads">
-
-</ul>
-
-<a href="new-thread.html" class="button">Create new Thread</a>
+<div id="subforum-list"></div>
 
 
+<div id="thread-list"></div>
+
+
+<a href="/new-thread.html">Create new thread</a>
 
 <script>
 
-    (function getForumName() {
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let id = urlParams.get('id');
+
+
+    function getChildForums(parentId) {
         let req = new XMLHttpRequest();
-        var url = window.location.search;
-        var queryParam = new URLSearchParams(url);
-        var subforumId = queryParam.get("id");
-        req.open("GET", `http://localhost:3000/subforums/${subforumId}`);
-        req.addEventListener("load", forumNameHandler);
+        req.addEventListener("load", () => {
+            console.log(req.responseText);
+           // const forums = JSON.parse(req.responseText);
+            //cb(forums);
+            printChildForums(JSON.parse(req.responseText));
+        });
+        req.open("GET", "http://localhost:3000/subforums?parentid=" + parentId);
         req.send();
-    })();
+    }
 
-    let req = new XMLHttpRequest();
-    var url = window.location.href;
-    var queryParam = new URLSearchParams(url);
-    var subforumId = queryParam.get("id");
-    req.open("GET", `http://localhost:3000/thread?subforum=${subforumId}`);
-    req.addEventListener("load", handleThreadReponse);
-    req.send();
+    getChildForums(id);
 
-    function handleThreadReponse() {
-        var reponseT = JSON.parse(this.responseText);
-        let list = document.getElementById("listsCorrespThreads");
-        for(obj of reponseT) {
-            let item = document.createElement("li");
-            var threadId = obj.id;
-            item.innerHTML =`<a href="thread.html?id=${threadId}">${obj.threadName}</a>`;
-            list.appendChild(item);
-        }
+    function printChildForums(forums) {
+
+            let subforum = "";
+            for(let i = 0; i < forums.length; i++) {
+                subforum += "<div> <span class='subforum'><a href='/subforum.html?id=" + forums[i].id + "'>" + forums[i].title + "</a> </span> </div>"
+
+            }
+            console.log(subforum);
+            document.getElementById("subforum-list").innerHTML = subforum;
 
     }
 
-    function forumNameHandler() {
-        if(this.status == 200) {
-            var response = JSON.parse(this.responseText);
-            var forumTitle = response.title;
-            let header = document.getElementById("forumName");
-            if(forumTitle !== null && forumTitle !== undefined) {
-                header.innerText = forumTitle;
-            }
-            else {
-                header.innerText = "FORUM";
-            }
-
-        }
+    function getThreads(id) {
+        let req = new XMLHttpRequest();
+        req.addEventListener("load", () => {
+            console.log(req.responseText);
+            printThreads(JSON.parse(req.responseText));
+        })
+        req.open("GET", "http://localhost:3000/thread?subforumId=" + id);
+        req.send();
     }
+    getThreads(id);
 
+    function printThreads(threads) {
 
+        let thread = "";
+        for (let i = 0; i < threads.length; i++) {
+            thread += "<div> <span class='thread'> <a href='/thread.html?id=" + threads[i].id + "'>" + threads[i].threadName + "</a></span> </div>"
+        }
+        document.getElementById("thread-list").innerHTML = thread;
+
+    }
 
 </script>
-
-
+<style>
+    form {
+        border: pink 1px solid;
+    }
+</style>
 </body>
 </html>
+

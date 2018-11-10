@@ -9,6 +9,9 @@
 <h1>Forum</h1>
 <div id="forum-list"></div>
 
+<a href="/new-subforum.html">
+    Create new subforum
+</a>
 
 
 <style>
@@ -16,12 +19,11 @@
         display: block;
         padding-left: 16px;
 
-
-
     }
+
     a:link {
-          color: blue;
-      }
+        color: blue;
+    }
 
     a:visited {
         color: red;
@@ -50,16 +52,17 @@
             // Recreate tree of elements
 
             for (f of forums) {
-                if(!f.children) {
+                if (!f.children) {
                     f.children = [];
-                } if(!f.depth) {
+                }
+                if (!f.depth) {
                     f.depth = 0;
                 }
 
 
-                if (f.parentid){
+                if (f.parentid) {
                     const forum = forums.find(forum => f.parentid === forum.id);
-                    f.depth = forum.depth+1;
+                    f.depth = forum.depth + 1;
                     forum.children.push(f);
                 }
 
@@ -68,31 +71,40 @@
             console.log(forums);
             let forumTree = forums.filter(forum => forum.parentid === "");
             console.log(forumTree);
-            displayForums(forumTree);
+            //displayForums(forumTree);
+            getTitleAndId(forums);
 
         })
     }
+
     getSubforumList();
 
     function displayForums(forums) {
-        for(f of forums) {
+        for (f of forums) {
             let tab = "";
-            for(let i =0; i < f.depth; i++) {
+            for (let i = 0; i < f.depth; i++) {
                 tab += "&nbsp&nbsp";
             }
 
             subforum += "<div>" + tab + "<a href='subforum.html?id='" + f.id + ">" + f.title + "</a> </div>";
             document.getElementById("forum-list").innerHTML = subforum;
-            if(f.children.length > 0) {
+            if (f.children.length > 0) {
                 displayForums(f.children);
             }
         }
-
     }
 
+    function getTitleAndId(forums) {
+        for (let i = 0; i < forums.length; i++) {
+            const f = forums[i];
+            const option = document.createElement("a");
+            option.href = "/subforum.html?id=" + f.id;
+            option.innerText = f.title;
+            option.classList.add('forum');
+            document.getElementById("forum-list").appendChild(option);
 
-
-
+        }
+    }
 </script>
 
 </body>
